@@ -1,0 +1,9 @@
+/output/*
+.cache
+.pytest_cache/*/
+venv
+.idea
+.DS_Store
+pycache
+*.log
+.env
