@@ -34,7 +34,6 @@ class BasePage:
             self.clear_field(selector)
             locator = self.page.locator(selector)
             locator.fill(text)
-
         except Exception as e:
             raise Exception(f"Error while filling the field: {str(e)}")
 

@@ -4,6 +4,7 @@ import time
 import pytest
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
+from pages.base_page import BasePage
 
 load_dotenv()
 
@@ -34,15 +35,16 @@ def base_page(request, get_playwright):
     browser_instance = browser.launch(headless=True)
     page = browser_instance.new_page()
     page.goto(URL)
-    yield page
+    base_page_instance = BasePage(page)
+    yield base_page_instance
     _logger.info('Closing the browser after the test')
     page.close()
     browser_instance.close()
 
 
 def pytest_sessionfinish(session) -> None:
-    duration = session.duration
     reporter = session.config.pluginmanager.get_plugin('terminalreporter')
+    duration = time.time() - reporter._sessionstarttime
     reporter.write_sep('=', f'duration: {duration} seconds', yellow=True, bold=True)
 
 
@@ -56,11 +58,6 @@ def log_test_execution_time(request):
     _logger.info(f"Test '{test_name}' executed in {execution_time:.2f} seconds.")
 
 
-@pytest.fixture(scope='function', autouse=True)
-def failed_check(request) -> None:
-    yield
-    if request.node.rep_setup.failed:
-        logging.error(f'Setting up test failed! {request.node.nodeid}')
-    elif request.node.rep_setup.passed:
-        if request.node.rep_call.failed:
-            logging.error(f'Executing test failed! {request.node.nodeid}')
+def pytest_runtest_makereport(item, call):
+    if call.when == "call" and call.excinfo is not None:
+        logging.error(f"Test failed! {item.nodeid}")
