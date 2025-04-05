@@ -42,7 +42,7 @@ This is a portfolio project created to automate the functionality of the [Google
     pip install -r requirements.txt
     ```
 
-##№ 3. Run Tests:
+## 3. Run Tests:
 To run **all tests** locally using pytest:
 
 ```bash
