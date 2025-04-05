@@ -58,6 +58,12 @@ def log_test_execution_time(request):
     _logger.info(f"Test '{test_name}' executed in {execution_time:.2f} seconds.")
 
 
+@pytest.fixture(autouse=True)
+def setup_and_click_button(base_page: BasePage):
+    base_page.click_accept_cookies_button()
+    yield
+
+
 def pytest_runtest_makereport(item, call):
     if call.when == "call" and call.excinfo is not None:
         logging.error(f"Test failed! {item.nodeid}")

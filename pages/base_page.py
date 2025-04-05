@@ -1,10 +1,19 @@
 from playwright.sync_api import Page
 
+
 class BasePage:
     default_timeout = 10
 
     def __init__(self, page: Page):
         self.page = page
+        self.accept_cookies_button = "(//*[text()='Accept all'])[1]"
+
+    def wait_element_visible(self, selector: str) -> None:
+        try:
+            locator = self.page.locator(selector)
+            locator.wait_for(state="visible", timeout=self.default_timeout * 1000)
+        except Exception as e:
+            raise Exception(f"Error while waiting for element '{selector}' to become visible: {str(e)}")
 
     def click_on_element(self, selector: str) -> None:
         try:
@@ -30,16 +39,11 @@ class BasePage:
 
     def fill_field(self, selector: str, text: str) -> None:
         try:
-            self.wait_element_visible(selector)
             self.clear_field(selector)
             locator = self.page.locator(selector)
             locator.fill(text)
         except Exception as e:
             raise Exception(f"Error while filling the field: {str(e)}")
 
-    def wait_element_visible(self, selector: str) -> None:
-        try:
-            locator = self.page.locator(selector)
-            locator.wait_for(state="visible", timeout=self.default_timeout * 1000)
-        except Exception as e:
-            raise Exception(f"Error while waiting for element '{selector}' to become visible: {str(e)}")
+    def click_accept_cookies_button(self):
+        self.click_on_element(self.accept_cookies_button)

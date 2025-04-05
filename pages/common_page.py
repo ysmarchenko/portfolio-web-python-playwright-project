@@ -1,20 +1,22 @@
-from base_page import BasePage
+from typing import Optional
+from pages.base_page import BasePage
 from data.enums import Tabs, Languages, DropdownTypes
 
+
 class CommonPage(BasePage):
-    def __init__(self, driver):
-        super().__init__(driver)
+    def __init__(self, base_page):
+        super().__init__(base_page)
 
     # -----------------------------------------------------------
     #   ELEMENTS
     # -----------------------------------------------------------
     def select_translate_tab(self, tab_name: Tabs) -> str:
-        return f"button[aria-label='{tab_name.value} translation']"
+        return f"button[aria-label='{tab_name} translation']"
 
     def tab_selector(self, tab_name: Tabs) -> str:
         return f"//h1[text()='{tab_name.value} translation']/following-sibling::div"
 
-    def more_languages(self, dropdown_type: DropdownTypes) -> str:
+    def more_languages(self, dropdown_type: DropdownTypes) -> Optional[str]:
         if dropdown_type == DropdownTypes.FROM:
             return '//*[@aria-label="More source languages"]'
         elif dropdown_type == DropdownTypes.TO:
@@ -46,9 +48,7 @@ class CommonPage(BasePage):
         assert element_color == expected_color, f"Expected color {expected_color}, but got {element_color}"
 
     def click_google_translate_tab(self, tab_name: Tabs) -> None:
-        tab = self.page.locator(self.select_translate_tab(tab_name))
-        self.wait_element_visible(self.select_translate_tab(tab_name))
-        tab.click()
+        self.click_on_element(self.select_translate_tab(tab_name))
 
     def check_selected_language(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages, color: str = '#1a73e8') -> None:
         selected_lang_elem = self.page.locator(self.selected_language(tab_name, dropdown_type, language))
@@ -56,22 +56,16 @@ class CommonPage(BasePage):
         assert selected_lang_elem.evaluate('el => getComputedStyle(el).color') == color
 
     def click_language_tab(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages) -> None:
-        language_tab = self.page.locator(self.select_language_tab(tab_name, dropdown_type, language))
-        self.wait_element_visible(self.select_language_tab(tab_name, dropdown_type, language))
-        language_tab.click()
+        self.click_on_element(self.select_language_tab(tab_name, dropdown_type, language))
         self.check_selected_language(tab_name, dropdown_type, language, '#174ea6')
 
     def click_swap_languages(self, tab_name: Tabs) -> None:
-        swap_button = self.page.locator(self.swap_languages_button(tab_name))
-        self.wait_element_visible(self.swap_languages_button(tab_name))
-        swap_button.click()
+        self.click_on_element(self.swap_languages_button(tab_name))
 
     def search_and_select_language(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages) -> None:
-        self.page.locator(self.open_languages_dropdown(tab_name, dropdown_type)).click()
-        self.wait_element_visible(self.search_languages_input(tab_name, dropdown_type))
-        search_input = self.page.locator(self.search_languages_input(tab_name, dropdown_type))
-        search_input.fill(language.value)
-        self.page.locator(self.search_language_option(language)).click()
+        self.click_on_element(self.open_languages_dropdown(tab_name, dropdown_type))
+        self.fill_field(self.search_languages_input(tab_name, dropdown_type), language.value)
+        self.click_on_element(self.search_language_option(language))
         self.check_selected_language(tab_name, dropdown_type, language)
 
     def select_from_to_languages(self, tab_name: Tabs, from_language: Languages, to_language: Languages) -> None:
