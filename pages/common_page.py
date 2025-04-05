@@ -1,7 +1,9 @@
+import time
 from typing import Optional
 from pages.base_page import BasePage
 from data.enums import Tabs, Languages, DropdownTypes
 
+selected_tab_color = "rgb(26, 115, 232)"
 
 class CommonPage(BasePage):
     def __init__(self, base_page):
@@ -14,7 +16,7 @@ class CommonPage(BasePage):
         return f"button[aria-label='{tab_name} translation']"
 
     def tab_selector(self, tab_name: Tabs) -> str:
-        return f"//h1[text()='{tab_name.value} translation']/following-sibling::div"
+        return f"//h1[text()='{tab_name} translation']/following-sibling::div"
 
     def more_languages(self, dropdown_type: DropdownTypes) -> Optional[str]:
         if dropdown_type == DropdownTypes.FROM:
@@ -50,13 +52,14 @@ class CommonPage(BasePage):
     def click_google_translate_tab(self, tab_name: Tabs) -> None:
         self.click_on_element(self.select_translate_tab(tab_name))
 
-    def check_selected_language(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages, color: str = '#1a73e8') -> None:
+    def check_selected_language(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages) -> None:
         selected_lang_elem = self.page.locator(self.selected_language(tab_name, dropdown_type, language))
-        self.check_element_color(selected_lang_elem, color)
+        self.click_google_translate_tab(tab_name)
+        self.check_element_color(selected_lang_elem, selected_tab_color)
 
     def click_language_tab(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages) -> None:
         self.click_on_element(self.select_language_tab(tab_name, dropdown_type, language))
-        self.check_selected_language(tab_name, dropdown_type, language, '#174ea6')
+        self.check_selected_language(tab_name, dropdown_type, language)
 
     def click_swap_languages(self, tab_name: Tabs) -> None:
         self.click_on_element(self.swap_languages_button(tab_name))
@@ -69,4 +72,5 @@ class CommonPage(BasePage):
 
     def select_from_to_languages(self, tab_name: Tabs, from_language: Languages, to_language: Languages) -> None:
         self.search_and_select_language(tab_name, DropdownTypes.FROM, from_language)
+        time.sleep(1) # Need to wait 1 second due to the animation, there is no other way to handle animation
         self.search_and_select_language(tab_name, DropdownTypes.TO, to_language)
