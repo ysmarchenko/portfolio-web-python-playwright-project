@@ -20,8 +20,7 @@ class TestSelectLanguage:
     @pytest.mark.parametrize("tab", tab_names)
     def test_search_and_select_languages(self, common_page, tab):
         common_page.click_google_translate_tab(tab)
-        common_page.search_and_select_language(tab, DropdownTypes.FROM, Languages.ENGLISH)
-        common_page.search_and_select_language(tab, DropdownTypes.TO, Languages.SPANISH)
+        common_page.select_from_to_languages(tab, Languages.ENGLISH, Languages.SPANISH)
 
     @pytest.mark.parametrize("tab", tab_names)
     def test_swap_languages_button(self, common_page, tab):
