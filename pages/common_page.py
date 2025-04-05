@@ -52,8 +52,7 @@ class CommonPage(BasePage):
 
     def check_selected_language(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages, color: str = '#1a73e8') -> None:
         selected_lang_elem = self.page.locator(self.selected_language(tab_name, dropdown_type, language))
-        self.wait_element_visible(self.selected_language(tab_name, dropdown_type, language))
-        assert selected_lang_elem.evaluate('el => getComputedStyle(el).color') == color
+        self.check_element_color(selected_lang_elem, color)
 
     def click_language_tab(self, tab_name: Tabs, dropdown_type: DropdownTypes, language: Languages) -> None:
         self.click_on_element(self.select_language_tab(tab_name, dropdown_type, language))
